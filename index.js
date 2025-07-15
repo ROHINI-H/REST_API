@@ -32,10 +32,26 @@ const users = [
 // Middleware to parse JSON
 app.use(express.json());
 
+// Middleware to log the details of each request
+app.use((req, res, next) => {
+    res.on('finish', () => {
+        console.log(`${new Date()} ${req.method} Method URL - "${req.originalUrl}" returns ${res.statusCode} status`);
+    });
+    next();
+});
+
+// Validation middleware
+function validation(req, res, next) {
+    const { name, age, hobby } = req.body;
+    if (!name) return res.status(400).json({ message: "Missing name field: Please enter your name" });
+    if (!age) return res.status(400).json({ message: "Missing age field: Please enter your age" });
+    if (!hobby) return res.status(400).json({ message: "Missing hobby field: Please enter your hobby" });
+    next();
+}
 
 // Fetch the list of all users
 app.get("/users", (req, res) => {
-    res.send(users);
+    res.status(200).json(users);
 });
 
 // Fetch details of a specific user by ID
@@ -51,11 +67,11 @@ app.get("/users/:id", (req, res) => {
         return res.status(404).json({ message: "User does not exist" });
     }
 
-    res.send(user);
+    res.status(200).json(user);
 });
 
 // Add a new user
-app.post("/user", (req, res) => {
+app.post("/user", validation, (req, res) => {
     const { name, age, hobby } = req.body;
 
     // create a new user record
@@ -68,11 +84,11 @@ app.post("/user", (req, res) => {
 
     // push the new user to users list
     users.push(newUser);
-    res.send(users);
+    res.status(201).json(newUser);
 });
 
 // Update details of an existing user
-app.put("/user/:id", (req, res) => {
+app.put("/user/:id", validation, (req, res) => {
     // get the user id
     const userId = req.params.id;
 
@@ -90,7 +106,7 @@ app.put("/user/:id", (req, res) => {
         user[key] = req.body[key];
     });
 
-    res.send(users);
+    res.status(200).json(user);
 });
 
 // Delete a user by ID
@@ -108,5 +124,5 @@ app.delete("/user/:id", (req, res) => {
 
     // filtering the users array without the deleted user
     const filteredUser = users.filter(user => user.id != userId);
-    res.send(filteredUser);
+    res.status(200).json(filteredUser);
 });
