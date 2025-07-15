@@ -1,5 +1,6 @@
 {
   "name": "rest_api",
+  "type": "module",
   "version": "1.0.0",
   "description": "A RESTful API using Node.js and Express",
   "main": "index.js",
