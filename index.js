@@ -42,6 +42,7 @@ app.use((req, res, next) => {
 
 // Validation middleware
 function validation(req, res, next) {
+    // check for required field. If not present, then throw error 
     const { name, age, hobby } = req.body;
     if (!name) return res.status(400).json({ message: "Missing name field: Please enter your name" });
     if (!age) return res.status(400).json({ message: "Missing age field: Please enter your age" });
